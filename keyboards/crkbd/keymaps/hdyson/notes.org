@@ -25,19 +25,3 @@
 ** DONE emacs shortcuts:
 
 1. use ~f12~ for ~recompile~.  Need either ~f12~ in keymap, or change emacs config.
-
-
-* Potential compile issues
-
-** config.h
-
-#+begin_src C
-#define SSD1306OLED
-
-#+end_src
-
-** rules.mk
-
-#+begin_src
-TAP_DANCE_ENABLE = yes
-#+end_src
