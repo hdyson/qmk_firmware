@@ -1,0 +1,27 @@
+* Compile command
+
+  #+begin_src shell
+  make clean ; make crkbd/rev1/common:hdyson
+  #+end_src
+
+** and deploy:
+  #+begin_src shell
+  make clean ; make crkbd/rev1/common:hdyson:avrdude
+  #+end_src
+* [2/5] Things to try:
+
+** CANCELLED Shift movement keys left to avoid collision with layer keys
+
+** TODO Mirror RGB keys on right...
+
+** TODO ...and decrement HSV values on left/increment on right
+
+** TODO What to use OLED displays for?
+
+** DONE Fix multimedia keys
+
+* [1/1] Must fix
+
+** DONE emacs shortcuts:
+
+1. use ~f12~ for ~recompile~.  Need either ~f12~ in keymap, or change emacs config.
