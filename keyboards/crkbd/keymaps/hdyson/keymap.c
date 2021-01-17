@@ -36,10 +36,21 @@ enum custom_keycodes {
   RGBRST
 };
 
+// Tap Dance declarations
+enum {
+    TD_U_COMPILE,
+};
+
+// Tap Dance definitions
+qk_tap_dance_action_t tap_dance_actions[] = {
+    // Tap once for u, twice for f12 (recompile in my emacs config).
+    [TD_U_COMPILE] = ACTION_TAP_DANCE_DOUBLE(KC_U, KC_F12),
+};
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [_QWERTY] = LAYOUT_split_3x6_3( \
   //,-----------------------------------------------------------------------------------------.                   ,-----------------------------------------------------------------------------------------------.
-         KC_GESC,         KC_Q,         KC_W,         KC_E,         KC_R, LT(_MOVEMENT, KC_T),                     LT(_MOVEMENT, KC_Y), KC_U,         KC_I,         KC_O,            KC_P,     KC_BSPC,\
+         KC_GESC,         KC_Q,         KC_W,         KC_E,         KC_R, LT(_MOVEMENT, KC_T),                     LT(_MOVEMENT, KC_Y), TD(TD_U_COMPILE),         KC_I,         KC_O,            KC_P,     KC_BSPC,\
   //|-----------+-------------+-------------+-------------+-------------+---------------------|                   |-------------------+-----------------+-------------+-------------+----------------+------------|
           KC_TAB, LGUI_T(KC_A), LALT_T(KC_S), LCTL_T(KC_D), LSFT_T(KC_F), LT(_NUMBERS, KC_G),                       LT(_NUMBERS, KC_H),     LSFT_T(KC_J), LCTL_T(KC_K), LALT_T(KC_L), LGUI_T(KC_SCLN),     KC_QUOT,\
   //|-----------+-------------+-------------+-------------+-------------+---------------------|                   |-------------------+-----------------+-------------+-------------+----------------+------------|
