@@ -18,53 +18,72 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include QMK_KEYBOARD_H
 
+// Each layer gets a name for readability, which is then used in the keymap matrix below.
+// The underscores don't mean anything - you can have a layer called STUFF or any other name.
+// Layer names don't all need to be of the same length, obviously, and you can also skip them
+// entirely and just use numbers.
+#define _QWERTY 0
+#define _MOVEMENT 1
+#define _NUMBERS 2
+#define _SYMBOLS 3
+
+enum custom_keycodes {
+  QWERTY = SAFE_RANGE,
+  MOVEMENT,
+  NUMBERS,
+  SYMBOLS,
+  BACKLIT,
+  RGBRST
+};
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-  [0] = LAYOUT_split_3x6_3(
-  //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-       KC_TAB,    KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                         KC_Y,    KC_U,    KC_I,    KC_O,   KC_P,  KC_BSPC,
-  //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LCTL,    KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                         KC_H,    KC_J,    KC_K,    KC_L, KC_SCLN, KC_QUOT,
-  //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LSFT,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH,  KC_ESC,
-  //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LGUI,   MO(1),  KC_SPC,     KC_ENT,   MO(2), KC_RALT
-                                      //`--------------------------'  `--------------------------'
-
+  [_QWERTY] = LAYOUT_split_3x6_3( \
+  //,-----------------------------------------------------------------------------------------.                   ,-----------------------------------------------------------------------------------------------.
+         KC_GESC,         KC_Q,         KC_W,         KC_E,         KC_R, LT(_MOVEMENT, KC_T),                     LT(_MOVEMENT, KC_Y), KC_U,         KC_I,         KC_O,            KC_P,     KC_BSPC,\
+  //|-----------+-------------+-------------+-------------+-------------+---------------------|                   |-------------------+-----------------+-------------+-------------+----------------+------------|
+          KC_TAB, LGUI_T(KC_A), LALT_T(KC_S), LCTL_T(KC_D), LSFT_T(KC_F), LT(_NUMBERS, KC_G),                       LT(_NUMBERS, KC_H),     LSFT_T(KC_J), LCTL_T(KC_K), LALT_T(KC_L), LGUI_T(KC_SCLN),     KC_QUOT,\
+  //|-----------+-------------+-------------+-------------+-------------+---------------------|                   |-------------------+-----------------+-------------+-------------+----------------+------------|
+     KC_LBRACKET,         KC_Z,         KC_X,         KC_C,         KC_V,   LT(_SYMBOLS, KC_B),                     LT(_SYMBOLS, KC_N),             KC_M,      KC_COMM,       KC_DOT,         KC_SLSH, KC_RBRACKET,\
+  //|-----------+-------------+-------------+-------------+-------------+---------------------+-------|  |--------+-------------------+-----------------+-------------+-------------+----------------+------------|
+                                                                 KC_LPRN,              NUMBERS, KC_SPC,     KC_ENT,            SYMBOLS,          KC_RPRN\
+                                                          //`-----------------------------------------'  `----------------------------------------------'
   ),
 
-  [1] = LAYOUT_split_3x6_3(
+  [_MOVEMENT] = LAYOUT_split_3x6_3( \
+  //,--------------------------------------------------------.                    ,--------------------------------------------------------.
+      KC_TRNS, KC_TRNS,   KC_TRNS, KC_TRNS, KC_TRNS,  KC_TRNS,                      KC_TRNS, KC_TRNS,  KC_TRNS,   KC_TRNS, KC_TRNS, KC_TRNS,\
+  //|--------+--------+----------+--------+--------+---------|                    |--------+--------+---------+----------+--------+--------|
+      KC_TRNS, KC_HOME,   KC_PGUP, KC_LEFT,   KC_UP, KC_RIGHT,                      KC_LEFT,   KC_UP, KC_RIGHT,   KC_PGUP, KC_HOME, KC_TRNS,\
+  //|--------+--------+----------+--------+--------+---------|                    |--------+--------+---------+----------+--------+--------|
+      KC_TRNS,  KC_END, KC_PGDOWN, KC_LEFT, KC_DOWN, KC_RIGHT,                      KC_LEFT, KC_DOWN, KC_RIGHT, KC_PGDOWN,  KC_END, KC_TRNS,\
+  //|--------+--------+----------+--------+--------+---------+--------|  |--------+--------+--------+---------+----------+--------+--------|
+                                            KC_TRNS,  KC_TRNS, KC_TRNS,    KC_TRNS, KC_TRNS, KC_TRNS\
+                                        //`---------------------------'  `--------------------------'
+    ),
+  // Numbers and RGB controls
+  // Relies on shift to decrease behaviour for hue, saturation and value controls
+  [_NUMBERS] = LAYOUT_split_3x6_3( \
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-       KC_TAB,    KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                         KC_6,    KC_7,    KC_8,    KC_9,    KC_0, KC_BSPC,
+        RESET,    KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                         KC_6,    KC_7,    KC_8,    KC_9,    KC_0, KC_TRNS,\
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LCTL, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_LEFT, KC_DOWN,   KC_UP,KC_RIGHT, XXXXXXX, XXXXXXX,
+      RGB_TOG, RGB_HUI, RGB_SAI, RGB_VAI, RGBRST,  KC_TRNS,                      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,\
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LSFT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+      RGB_MOD,   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                        KC_F6,   KC_F7,   KC_F8,   KC_F9,  KC_F10, KC_TRNS,\
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LGUI, _______,  KC_SPC,     KC_ENT,   MO(3), KC_RALT
+                                          KC_TRNS, KC_TRNS, KC_TRNS,    KC_TRNS, KC_TRNS, KC_TRNS\
                                       //`--------------------------'  `--------------------------'
   ),
 
-  [2] = LAYOUT_split_3x6_3(
+  // Symbols and media controls
+  [_SYMBOLS] = LAYOUT_split_3x6_3( \
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-       KC_TAB, KC_EXLM,   KC_AT, KC_HASH,  KC_DLR, KC_PERC,                      KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_BSPC,
+      KC_TILD, KC_EXLM,   KC_AT, KC_HASH,  KC_DLR, KC_PERC,                      KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_TRNS,\
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LCTL, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_MINS,  KC_EQL, KC_LBRC, KC_RBRC, KC_BSLS,  KC_GRV,
+      KC_BRMU, VLK_TOG, KC_MFFD, KC_MUTE, KC_VOLU, KC_TRNS,                      KC_MINS,  KC_EQL, KC_TRNS, KC_TRNS, KC_PIPE, KC_TRNS,\
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LSFT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_UNDS, KC_PLUS, KC_LCBR, KC_RCBR, KC_PIPE, KC_TILD,
+      KC_BRMD, RGB_M_SW, KC_MPRV, KC_MPLY, KC_VOLD, KC_TRNS,                      KC_TRNS, KC_PLUS, KC_TRNS, KC_TRNS, KC_BSLS, KC_TRNS,\
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LGUI,   MO(3),  KC_SPC,     KC_ENT, _______, KC_RALT
-                                      //`--------------------------'  `--------------------------'
-  ),
-
-  [3] = LAYOUT_split_3x6_3(
-  //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-        RESET, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      RGB_TOG, RGB_HUI, RGB_SAI, RGB_VAI, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      RGB_MOD, RGB_HUD, RGB_SAD, RGB_VAD, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LGUI, _______,  KC_SPC,     KC_ENT, _______, KC_RALT
+                                          KC_TRNS, KC_TRNS, KC_TRNS,    KC_TRNS, KC_TRNS, KC_TRNS\
                                       //`--------------------------'  `--------------------------'
   )
 };
