@@ -23,9 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Layer names don't all need to be of the same length, obviously, and you can also skip them
 // entirely and just use numbers.
 #define _QWERTY 0
-#define _MOVEMENT 1
-#define _NUMBERS 2
-#define _SYMBOLS 3
+#define _NUMBERS 1
+#define _SYMBOLS 2
+#define _MOVEMENT 3
 
 enum custom_keycodes {
   QWERTY = SAFE_RANGE,
@@ -56,21 +56,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|-----------+-------------+-------------+-------------+-------------+---------------------|                   |-------------------+-----------------+-------------+-------------+----------------+------------|
      KC_LBRACKET,         KC_Z,         KC_X,         KC_C,         KC_V,   LT(_SYMBOLS, KC_B),                     LT(_SYMBOLS, KC_N),             KC_M,      KC_COMM,       KC_DOT,         KC_SLSH, KC_RBRACKET,\
   //|-----------+-------------+-------------+-------------+-------------+---------------------+-------|  |--------+-------------------+-----------------+-------------+-------------+----------------+------------|
-                                                                 KC_LPRN,         TG(_NUMBERS), KC_SPC,     KC_ENT,       TG(_SYMBOLS),          KC_RPRN\
+                                                                 KC_LPRN,         TG(_NUMBERS), KC_SPC,     KC_ENT,      TG(_SYMBOLS),          KC_RPRN\
                                                           //`-----------------------------------------'  `----------------------------------------------'
   ),
 
-  [_MOVEMENT] = LAYOUT_split_3x6_3( \
-  //,--------------------------------------------------------.                    ,--------------------------------------------------------.
-      KC_TRNS, KC_TRNS,   KC_TRNS, KC_TRNS, KC_TRNS,  KC_TRNS,                      KC_TRNS, KC_TRNS,  KC_TRNS,   KC_TRNS, KC_TRNS, KC_TRNS,\
-  //|--------+--------+----------+--------+--------+---------|                    |--------+--------+---------+----------+--------+--------|
-      KC_TRNS, KC_HOME,   KC_PGUP, KC_LEFT,   KC_UP, KC_RIGHT,                      KC_LEFT,   KC_UP, KC_RIGHT,   KC_PGUP, KC_HOME, KC_TRNS,\
-  //|--------+--------+----------+--------+--------+---------|                    |--------+--------+---------+----------+--------+--------|
-      KC_TRNS,  KC_END, KC_PGDOWN, KC_LEFT, KC_DOWN, KC_RIGHT,                      KC_LEFT, KC_DOWN, KC_RIGHT, KC_PGDOWN,  KC_END, KC_TRNS,\
-  //|--------+--------+----------+--------+--------+---------+--------|  |--------+--------+--------+---------+----------+--------+--------|
-                                            KC_TRNS,  KC_TRNS, KC_TRNS,    KC_TRNS, KC_TRNS, KC_TRNS\
-                                        //`---------------------------'  `--------------------------'
-    ),
   // Numbers and RGB controls
   // Relies on shift to decrease behaviour for hue, saturation and value controls
   [_NUMBERS] = LAYOUT_split_3x6_3( \
@@ -96,7 +85,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                           KC_TRNS, KC_TRNS, KC_TRNS,    KC_TRNS, KC_TRNS, KC_TRNS\
                                       //`--------------------------'  `--------------------------'
-  )
+  ),
+
+  [_MOVEMENT] = LAYOUT_split_3x6_3( \
+  //,--------------------------------------------------------.                    ,--------------------------------------------------------.
+      KC_TRNS, KC_TRNS,   KC_TRNS, KC_TRNS, KC_TRNS,  KC_TRNS,                      KC_TRNS, KC_TRNS,  KC_TRNS,   KC_TRNS, KC_TRNS, KC_TRNS,\
+  //|--------+--------+----------+--------+--------+---------|                    |--------+--------+---------+----------+--------+--------|
+      KC_TRNS, KC_HOME,   KC_PGUP, KC_LEFT,   KC_UP, KC_RIGHT,                      KC_LEFT,   KC_UP, KC_RIGHT,   KC_PGUP, KC_HOME, KC_TRNS,\
+  //|--------+--------+----------+--------+--------+---------|                    |--------+--------+---------+----------+--------+--------|
+      KC_TRNS,  KC_END, KC_PGDOWN, KC_LEFT, KC_DOWN, KC_RIGHT,                      KC_LEFT, KC_DOWN, KC_RIGHT, KC_PGDOWN,  KC_END, KC_TRNS,\
+  //|--------+--------+----------+--------+--------+---------+--------|  |--------+--------+--------+---------+----------+--------+--------|
+                                            KC_TRNS,  KC_TRNS, KC_TRNS,    KC_TRNS, KC_TRNS, KC_TRNS\
+                                        //`---------------------------'  `--------------------------'
+    ),
 };
 
 #ifdef OLED_DRIVER_ENABLE
@@ -108,9 +109,9 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 }
 
 #define L_BASE 0
-#define L_LOWER 2
-#define L_RAISE 4
-#define L_ADJUST 8
+#define L_NUMBERS 2
+#define L_SYMBOLS 4
+#define L_MOVEMENT 8
 
 void oled_render_layer_state(void) {
     oled_write_P(PSTR("Layer: "), false);
@@ -118,21 +119,25 @@ void oled_render_layer_state(void) {
         case L_BASE:
             oled_write_ln_P(PSTR("Default"), false);
             break;
-        case L_LOWER:
-            oled_write_ln_P(PSTR("Lower"), false);
+        case L_NUMBERS:
+	  oled_write_ln_P(PSTR("Numbers"), false);
             break;
-        case L_RAISE:
-            oled_write_ln_P(PSTR("Raise"), false);
+        case L_SYMBOLS:
+            oled_write_ln_P(PSTR("Symbols"), false);
             break;
-        case L_ADJUST:
-        case L_ADJUST|L_LOWER:
-        case L_ADJUST|L_RAISE:
-        case L_ADJUST|L_LOWER|L_RAISE:
-            oled_write_ln_P(PSTR("Adjust"), false);
+        case L_MOVEMENT:
+        case L_MOVEMENT|L_NUMBERS:
+        case L_MOVEMENT|L_SYMBOLS:
+        case L_MOVEMENT|L_SYMBOLS|L_NUMBERS:
+            oled_write_ln_P(PSTR("Movement"), false);
             break;
     }
 }
 
+layer_state_t layer_state_set_user(layer_state_t state) {
+    state = update_tri_layer_state(state, _SYMBOLS, _NUMBERS, _MOVEMENT);
+    return state;
+}
 
 char keylog_str[24] = {};
 
